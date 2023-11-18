@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Grafo {
 	private ArrayList<Cidade> cidades;
@@ -27,17 +28,17 @@ public class Grafo {
 		return cidades;
 	}
 
-	public void matrizAdjacente() {
+	public int[][] matrizAdjacente() {
 		this.size = cidades.size();
-		String matrix[][] = new String[this.size][this.size];
+		int matrix[][] = new int[this.size][this.size];
 
 		for (int i = 0; i < this.size; i++) {
 			for (int j = 0; j < this.size; j++) {
 				Aresta aresta = getArestaEntreCidades(cidades.get(i), cidades.get(j));
 				if (aresta != null) {
-					matrix[i][j] = String.valueOf(aresta.getPeso());
+					matrix[i][j] = (int) aresta.getPeso();
 				} else {
-					matrix[i][j] = " ##";
+					matrix[i][j] = 0;
 				}
 			}
 		}
@@ -45,7 +46,7 @@ public class Grafo {
 		// Imprimir a matriz com os nomes das cidades
 		System.out.print("  ");
 		for (int i = 0; i < this.size; i++) {
-			System.out.print(" " + cidades.get(i).getNome() + "  ");
+			System.out.print(cidades.get(i).getNome() + "  ");
 		}
 		System.out.println();
 		for (int i = 0; i < this.size; i++) {
@@ -55,6 +56,8 @@ public class Grafo {
 			}
 			System.out.println();
 		}
+
+		return matrix;
 	}
 
 	private Aresta getArestaEntreCidades(Cidade cidade1, Cidade cidade2) {
@@ -66,19 +69,87 @@ public class Grafo {
 		return null;
 	}
 
-	public void getDistancia(String cidade1, String cidade2) {
-	int i=0;
-	
-			for (Cidade cidade : cidades) {
-				if (cidade.getNome().equals(cidade1) || cidade.getAresta().get(i++).equals(cidade2)) {
-					System.out.println(" - ");
-			
-				}
-			
+	/*
+	 * public void dijkstra(String cidade1, String cidade2) { int matrix[][] =
+	 * matrizAdjacente();
+	 * 
+	 * List<Boolean> visitada = new ArrayList<>(); int m = Integer.MAX_VALUE,
+	 * m_index = 0; Boolean spSet[] = new Boolean[this.size];
+	 * 
+	 * int distancia[] = new int[this.size];
+	 * 
+	 * for (int j = 0; j < this.size; j++) { distancia[j] = Integer.MAX_VALUE;
+	 * spSet[j] = false; }
+	 * 
+	 * for (int vx = 0; vx < this.size; vx++) { if (spSet[vx] == false &&
+	 * distancia[vx] <= m) { m = distancia[vx]; m_index = vx; } }
+	 * 
+	 * int i = 0; while (i < this.size) { if
+	 * (cidades.get(i).getNome().equals(cidade1)) { distancia[i] = 0; } i++; }
+	 * 
+	 * for (int cnt = 0; cnt < this.size; cnt++) { spSet[m_index] = true; for (int
+	 * vx = 0; vx < this.size; vx++) { if (!spSet[vx] && matrix[m_index][vx] != 0 &&
+	 * distancia[m_index] != Integer.MAX_VALUE && distancia[m_index] +
+	 * matrix[m_index][vx] < distancia[vx]) {
+	 * 
+	 * } } }
+	 * 
+	 * // Imprimir a menor distância até a cidade2 for (int vx = 0; vx < this.size;
+	 * vx++) { if (cidades.get(vx).getNome().equals(cidade2)) {
+	 * System.out.println("A menor distância de " + cidade1 + " para " + cidade2 +
+	 * " é " + distancia[vx]); } } }
+	 */
+	public void dijkstra(String cidade1, String cidade2) {
+		int matrix[][] = matrizAdjacente();
 
+		int m = Integer.MAX_VALUE, m_index = 0;
+		Boolean spSet[] = new Boolean[this.size];
+
+		int distancia[] = new int[this.size];
+
+		for (int j = 0; j < this.size; j++) {
+			distancia[j] = Integer.MAX_VALUE;
+			spSet[j] = false;
 		}
 
-		// System.out.println(getArestaEntreCidades(null, null));
+		for (int vx = 0; vx < this.size; vx++) {
+			if (spSet[vx] == false && distancia[vx] <= m) {
+				m = distancia[vx];
+				m_index = vx;
+			}
+		}
+
+		int i = 0;
+		while (i < this.size) {
+			if (cidades.get(i).getNome().equals(cidade1)) {
+				distancia[i] = 0;
+			}
+			i++;
+		}
+
+		for (int cnt = 0; cnt < this.size; cnt++) {
+			spSet[m_index] = true;
+			for (int vx = 0; vx < this.size; vx++) {
+				if (!spSet[vx] && matrix[m_index][vx] != 0 && distancia[m_index] != Integer.MAX_VALUE
+						&& distancia[m_index] + matrix[m_index][vx] < distancia[vx]) {
+					distancia[vx] = distancia[m_index] + matrix[m_index][vx];
+				}
+			}
+			m = Integer.MAX_VALUE;
+			for (int vx = 0; vx < this.size; vx++) {
+				if (spSet[vx] == false && distancia[vx] <= m) {
+					m = distancia[vx];
+					m_index = vx;
+				}
+			}
+		}
+
+		// Imprimir a menor distância até a cidade2
+		for (int vx = 0; vx < this.size; vx++) {
+			if (cidades.get(vx).getNome().equals(cidade2)) {
+				System.out.println("A menor distância de " + cidade1 + " para " + cidade2 + " é " + distancia[vx]);
+			}
+		}
 	}
 
 }
